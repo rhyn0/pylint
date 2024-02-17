@@ -61,11 +61,20 @@ class BooleanNamingChecker(BaseChecker):
         assign_target = (
             node.elts[index] if isinstance(node, (nodes.Tuple, nodes.List)) else node
         )
-        if not self._name_starts_with_prefix(assign_target.name):
+        if not isinstance(
+            assign_target, (nodes.AssignName, nodes.Attribute, nodes.AssignAttr)
+        ):
+            return
+        name = (
+            assign_target.name
+            if isinstance(assign_target, nodes.AssignName)
+            else assign_target.attrname
+        )
+        if not self._name_starts_with_prefix(name):
             self.add_message(
                 "invalid-boolean-variable-name",
                 node=assign_target,
-                args=assign_target.name,
+                args=name,
             )
 
     def visit_assign(self, node: nodes.Assign) -> None:
@@ -76,6 +85,11 @@ class BooleanNamingChecker(BaseChecker):
         elts = node.value.elts if hasattr(node.value, "elts") else (node.value,)
         # targets is a list of left hand side operators, usually compressed to one
         target = node.targets[0]
+        # if left side is a name, and right side is a container don't check it
+        if isinstance(target, nodes.AssignName) and isinstance(
+            node.value, (nodes.Tuple, nodes.List)
+        ):
+            return
         for idx in self._contains_bool_value(*elts):
             self._individual_assign_check(target, idx)
 
@@ -86,9 +100,14 @@ class BooleanNamingChecker(BaseChecker):
             or node.annotation.name != "bool"
         ):
             return
-        if not self._name_starts_with_prefix(node.target.name):
+        name = (
+            node.target.name
+            if isinstance(node.target, nodes.AssignName)
+            else node.target.attrname
+        )
+        if not self._name_starts_with_prefix(name):
             self.add_message(
-                "invalid-boolean-variable-name", node=node.target, args=node.target.name
+                "invalid-boolean-variable-name", node=node.target, args=name
             )
 
 
