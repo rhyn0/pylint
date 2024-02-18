@@ -98,8 +98,8 @@ jobs:
             console.log("Last run on main:")
             console.log(lastRunMain.html_url)
             const artifacts_main = await github.rest.actions.listWorkflowRunArtifacts({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
+               owner: 'pylint-dev',
+               repo: 'pylint',
                run_id: lastRunMain.id,
             });
 
