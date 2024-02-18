@@ -87,8 +87,8 @@ jobs:
             // Download 'main' pylint output
             const fs = require('fs');
             const runs = await github.rest.actions.listWorkflowRuns({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner: 'pylint-dev',
+              repo: 'pylint',
               workflow_id: ".github/workflows/primer_run_main.yaml",
               status: "success"
             });
@@ -107,8 +107,8 @@ jobs:
             const [matchArtifactMain] = artifacts_main.data.artifacts.filter((artifact) =>
               artifact.name === COMMIT_STRING_ARTIFACT);
             const downloadWorkflow = await github.rest.actions.downloadArtifact({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
+               owner: 'pylint-dev',
+               repo: 'pylint',
                artifact_id: matchArtifactMain.id,
                archive_format: "zip",
             });
@@ -118,8 +118,8 @@ jobs:
             const [matchArtifactMainOutput] = artifacts_main.data.artifacts.filter((artifact) =>
               artifact.name === OUTPUT_ARTIFACT);
             const downloadWorkflowTwo = await github.rest.actions.downloadArtifact({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
+               owner: 'pylint-dev',
+               repo: 'pylint',
                artifact_id: matchArtifactMainOutput.id,
                archive_format: "zip",
             });
